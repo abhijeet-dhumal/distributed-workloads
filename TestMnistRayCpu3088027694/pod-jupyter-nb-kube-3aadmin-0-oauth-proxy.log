@@ -1,0 +1,7 @@
+2024/08/28 11:02:05 provider.go:120: Defaulting client-id to system:serviceaccount:test-ns-gr68w:jupyter-nb-kube-3aadmin
+2024/08/28 11:02:05 provider.go:125: Defaulting client-secret to service account token /var/run/secrets/kubernetes.io/serviceaccount/token
+2024/08/28 11:02:05 oauthproxy.go:203: mapping path "/" => upstream "http://localhost:8888/"
+2024/08/28 11:02:05 oauthproxy.go:230: OAuthProxy configured for  Client ID: system:serviceaccount:test-ns-gr68w:jupyter-nb-kube-3aadmin
+2024/08/28 11:02:05 oauthproxy.go:240: Cookie settings: name:_oauth_proxy secure(https):true httponly:true expiry:24h0m0s domain:<default> samesite: refresh:disabled
+I0828 11:02:05.856916       1 dynamic_serving_content.go:130] Starting serving::/etc/tls/private/tls.crt::/etc/tls/private/tls.key
+2024/08/28 11:02:05 http.go:107: HTTPS: listening on [::]:8443
