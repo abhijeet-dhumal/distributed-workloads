@@ -18,15 +18,16 @@ package odh
 
 import (
 	"embed"
+	"fmt"
+	"net/http"
+	"net/url"
 
-	"github.com/onsi/gomega"
 	. "github.com/onsi/gomega"
+	gomega "github.com/onsi/gomega"
 	"github.com/project-codeflare/codeflare-common/support"
 	. "github.com/project-codeflare/codeflare-common/support"
 	rayv1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1"
-
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/api/core/v1"
 )
 
 //go:embed resources/*
@@ -39,17 +40,36 @@ func ReadFile(t support.Test, fileName string) []byte {
 	return file
 }
 
-// TODO: This belongs on codeflare-common/support/ray.go
-func rayClusters(t Test, namespace *corev1.Namespace) func(g Gomega) []*rayv1.RayCluster {
-	return func(g Gomega) []*rayv1.RayCluster {
-		rcs, err := t.Client().Ray().RayV1().RayClusters(namespace.Name).List(t.Ctx(), metav1.ListOptions{})
-		g.Expect(err).NotTo(HaveOccurred())
+func ReadJobLogs(test support.Test, namespace *v1.Namespace, rayCluster *rayv1.RayCluster) string {
+	dashboardName := "ray-dashboard-" + rayCluster.Name
+	fmt.Printf("Raycluster created : %s\n", rayCluster.Name)
+	route := GetRoute(test, namespace.Name, dashboardName)
+	hostname := route.Status.Ingress[0].Host
+	dashboardUrl, _ := url.Parse("https://" + hostname)
+	fmt.Printf("Ray-dashboard route : %s\n", dashboardUrl.String())
 
-		rcsp := []*rayv1.RayCluster{}
-		for _, v := range rcs.Items {
-			rcsp = append(rcsp, &v)
-		}
+	rayClient := NewRayClusterClient(*dashboardUrl, RayClusterClientConfig{SkipTlsVerification: true}, test.Config().BearerToken)
 
-		return rcsp
+	listJobsReq, err := http.NewRequest("GET", "https://"+hostname+"/api/jobs/", nil)
+	if err != nil {
+		fmt.Printf("failed to do get request: %s\n", err)
 	}
+	listJobsReq.Header.Add("Authorization", "Bearer "+test.Config().BearerToken)
+
+	allJobsData, err := rayClient.GetAllJobsData()
+	test.Expect(err).ToNot(HaveOccurred())
+
+	jobID := allJobsData[0]["submission_id"].(string)
+	if len(allJobsData) > 0 {
+		fmt.Printf("Ray job has been successfully submitted to the raycluster with Submission-ID : %s\n", jobID)
+	}
+
+	// Wait for the job to be succeeded or failed
+	result := rayClient.WaitForJobStatus(jobID)
+
+	rayJobLogs, err := rayClient.GetJobLogs(jobID)
+	test.Expect(err).ToNot(HaveOccurred())
+	WriteToOutputDir(test, "ray-job-log-"+jobID, Log, []byte(rayJobLogs))
+
+	return result
 }
