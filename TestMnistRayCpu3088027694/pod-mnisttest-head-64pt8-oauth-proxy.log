@@ -1,9 +1,0 @@
-2024/08/28 11:06:20 provider.go:129: Defaulting client-id to system:serviceaccount:test-ns-gr68w:mnisttest-oauth-proxy
-2024/08/28 11:06:20 provider.go:134: Defaulting client-secret to service account token /var/run/secrets/kubernetes.io/serviceaccount/token
-2024/08/28 11:06:20 provider.go:358: Delegation of authentication and authorization to OpenShift is enabled for bearer tokens and client certificates.
-2024/08/28 11:06:20 oauthproxy.go:203: mapping path "/" => upstream "http://localhost:8265/"
-2024/08/28 11:06:20 oauthproxy.go:230: OAuthProxy configured for  Client ID: system:serviceaccount:test-ns-gr68w:mnisttest-oauth-proxy
-2024/08/28 11:06:20 oauthproxy.go:240: Cookie settings: name:_oauth_proxy secure(https):true httponly:true expiry:168h0m0s domain:<default> samesite: refresh:disabled
-2024/08/28 11:06:20 http.go:61: HTTP: listening on 127.0.0.1:4180
-2024/08/28 11:06:20 http.go:107: HTTPS: listening on [::]:8443
-I0828 11:06:20.482978       1 dynamic_serving_content.go:130] Starting serving::/etc/tls/private/tls.crt::/etc/tls/private/tls.key
