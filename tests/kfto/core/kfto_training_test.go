@@ -106,7 +106,7 @@ func createKFTOPyTorchJob(test Test, namespace string, config corev1.ConfigMap, 
 								},
 								{
 									Name:            "copy-dataset",
-									Image:           "registry.access.redhat.com/ubi9/python-311:9.5-1730564330",
+									Image:           "registry.redhat.io/ubi9/python-311@sha256:891fd3a2c45a113f19aa4c49ef3a793d1a9f5ad3c6c26f65733967442665a32b",
 									ImagePullPolicy: corev1.PullIfNotPresent,
 									VolumeMounts: []corev1.VolumeMount{
 										{
